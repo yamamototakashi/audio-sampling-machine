@@ -5,9 +5,11 @@ import './styles/global.css';
 
 // Register the service worker. We do this regardless of standalone mode so
 // the app shell is cached for offline use after the first visit.
+// BASE_URL ensures correct paths under a sub-path deployment (GitHub Pages).
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
+    const base = import.meta.env.BASE_URL; // e.g. "/audio-sampling-machine/"
+    navigator.serviceWorker.register(`${base}sw.js`, { scope: base }).catch(() => {
       // Silent: SW failures shouldn't break the app on dev/preview.
     });
   });

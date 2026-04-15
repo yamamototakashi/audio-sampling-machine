@@ -1,12 +1,19 @@
-/* SMPLR service worker — minimal app-shell + runtime cache for offline PWA. */
-const VERSION = 'smplr-v1';
+/* SMPLR service worker — minimal app-shell + runtime cache for offline PWA.
+ *
+ * Path-portable: derives BASE from the SW's own location so the same file
+ * works whether deployed at "/", "/audio-sampling-machine/", or any
+ * other sub-path (e.g. GitHub Pages project site).
+ */
+const VERSION = 'smplr-v2';
+const BASE = new URL('./', self.location.href).pathname; // e.g. "/audio-sampling-machine/"
+
 const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/apple-touch-icon.png',
+  BASE,
+  BASE + 'index.html',
+  BASE + 'manifest.webmanifest',
+  BASE + 'icons/icon-192.png',
+  BASE + 'icons/icon-512.png',
+  BASE + 'icons/apple-touch-icon.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -30,11 +37,12 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  // Only handle same-origin GETs.
+  // Only handle same-origin GETs and only paths within our scope.
   if (url.origin !== self.location.origin) return;
+  if (!url.pathname.startsWith(BASE)) return;
 
   // Network-first for navigation so new builds appear quickly online,
-  // cache-first fallback when offline.
+  // cache fallback when offline.
   if (req.mode === 'navigate') {
     event.respondWith(
       fetch(req)
@@ -43,7 +51,9 @@ self.addEventListener('fetch', (event) => {
           caches.open(VERSION).then((c) => c.put(req, copy));
           return res;
         })
-        .catch(() => caches.match('/index.html').then((r) => r || Response.error())),
+        .catch(() =>
+          caches.match(BASE + 'index.html').then((r) => r || Response.error()),
+        ),
     );
     return;
   }

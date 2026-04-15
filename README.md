@@ -141,7 +141,42 @@ npm run preview
 
 ---
 
-## 7. iPhone Safari に関する注意（実装メモ）
+## 7. GitHub Pages へのデプロイ
+
+このリポジトリには `.github/workflows/deploy-pages.yml` を同梱しています。
+`main` または `claude/iphone-pwa-sampler-a3P35` への push で自動的に GitHub Pages にデプロイされます。
+
+### 初回セットアップ（リポジトリ側）
+
+1. GitHub のリポジトリ → **Settings** → **Pages**
+2. **Source** を `GitHub Actions` に変更
+3. （任意）`Settings → Environments → github-pages` のレビュー要件を確認
+4. ワークフローが走った後、URL は
+   ```
+   https://yamamototakashi.github.io/audio-sampling-machine/
+   ```
+
+### ローカルで Pages 用ビルドを試す
+
+```bash
+BASE=/audio-sampling-machine/ npm run build
+npx serve dist                              # http://localhost:3000/audio-sampling-machine/
+# もしくは
+npx http-server dist -c-1 -p 4173
+```
+
+> Pages 公開後は **HTTPS** で配信されるので、iPhone Safari の **マイク権限**と **PWA インストール** がそのまま動きます。
+> iPhone Safari で URL を開く → 共有 → 「ホーム画面に追加」 → アイコンから起動 → **START** タップで AudioContext unlock。
+
+### パスについて
+
+- `vite.config.ts` で `base` を `BASE` 環境変数から決定。Actions 内で `BASE=/${repo}/` を渡しています。
+- `index.html` / `manifest.webmanifest` / `icons` は **相対パス**で参照しているので、ルート配信／サブパス配信のどちらでも動作します。
+- `sw.js` は自身の URL から base を計算し、その scope 内のリクエストだけを処理します。
+
+---
+
+## 8. iPhone Safari に関する注意（実装メモ）
 
 - AudioContext は **必ずユーザー操作後**に resume。`App.tsx` の起動オーバーレイがその唯一の入口。
 - 録音 ScriptProcessorNode は deprecated だが、iOS の互換性が高く MVP には十分。AudioWorklet 移行は拡張枠。
