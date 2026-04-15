@@ -141,28 +141,40 @@ npm run preview
 
 ---
 
-## 7. GitHub Pages へのデプロイ
+## 7. GitHub Pages へのデプロイ（手動 / `gh-pages` ブランチ方式）
 
-このリポジトリには `.github/workflows/deploy-pages.yml` を同梱しています。
-`main` または `claude/iphone-pwa-sampler-a3P35` への push で自動的に GitHub Pages にデプロイされます。
+GitHub Actions を使わず、`gh-pages` ブランチへ build 成果物を push する方式で公開します。
 
-### 初回セットアップ（リポジトリ側）
+### 初回セットアップ（リポジトリ側で 1 回だけ）
 
-1. GitHub のリポジトリ → **Settings** → **Pages**
-2. **Source** を `GitHub Actions` に変更
-3. （任意）`Settings → Environments → github-pages` のレビュー要件を確認
-4. ワークフローが走った後、URL は
+1. ローカルで初回デプロイを実行
+   ```bash
+   npm install
+   npm run deploy        # build:pages → dist → gh-pages ブランチに force-push
+   ```
+2. GitHub のリポジトリ → **Settings** → **Pages**
+3. **Source** を `Deploy from a branch` に
+4. **Branch** を `gh-pages` / `/ (root)` に → **Save**
+5. 数十秒〜2 分ほどで以下の URL に公開されます
    ```
    https://yamamototakashi.github.io/audio-sampling-machine/
    ```
 
+### 更新するとき
+
+```bash
+npm run deploy
+```
+
+これだけで `dist` が再ビルドされ、`gh-pages` ブランチへ自動 push されます。
+Pages 側のキャッシュは即時更新されますが、SW のキャッシュが残るので
+iPhone 側で「再読み込み」または PWA を一度閉じて開き直してください。
+
 ### ローカルで Pages 用ビルドを試す
 
 ```bash
-BASE=/audio-sampling-machine/ npm run build
-npx serve dist                              # http://localhost:3000/audio-sampling-machine/
-# もしくは
-npx http-server dist -c-1 -p 4173
+npm run build:pages
+npx serve dist            # http://localhost:3000/audio-sampling-machine/
 ```
 
 > Pages 公開後は **HTTPS** で配信されるので、iPhone Safari の **マイク権限**と **PWA インストール** がそのまま動きます。
@@ -170,9 +182,10 @@ npx http-server dist -c-1 -p 4173
 
 ### パスについて
 
-- `vite.config.ts` で `base` を `BASE` 環境変数から決定。Actions 内で `BASE=/${repo}/` を渡しています。
+- `vite.config.ts` の `base` は `BASE` 環境変数から決定。`build:pages` で `BASE=/audio-sampling-machine/` を渡しています。
 - `index.html` / `manifest.webmanifest` / `icons` は **相対パス**で参照しているので、ルート配信／サブパス配信のどちらでも動作します。
-- `sw.js` は自身の URL から base を計算し、その scope 内のリクエストだけを処理します。
+- `sw.js` は自身の URL から base を計算し、scope 内のリクエストだけ処理します。
+- `predeploy` で `dist/index.html → dist/404.html` をコピーし、深い URL でも SPA フォールバックします。`dist/.nojekyll` で `_` 始まりファイルを Pages がスキップしないようにします。
 
 ---
 

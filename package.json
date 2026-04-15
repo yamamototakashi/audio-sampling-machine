@@ -7,8 +7,11 @@
   "scripts": {
     "dev": "vite --host",
     "build": "tsc -b && vite build",
+    "build:pages": "tsc -b && BASE=/audio-sampling-machine/ vite build",
     "preview": "vite preview --host",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "predeploy": "npm run build:pages && cp dist/index.html dist/404.html && touch dist/.nojekyll",
+    "deploy": "gh-pages -d dist -b gh-pages -t true -m \"Deploy $(date -u +%Y-%m-%dT%H:%M:%SZ)\""
   },
   "dependencies": {
     "idb": "^8.0.0",
@@ -17,9 +20,11 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@types/node": "^20.16.5",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
+    "gh-pages": "^6.2.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10"
   }
