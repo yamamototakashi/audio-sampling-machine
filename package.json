@@ -11,7 +11,7 @@
     "preview": "vite preview --host",
     "typecheck": "tsc -b --noEmit",
     "predeploy": "npm run build:pages && cp dist/index.html dist/404.html && touch dist/.nojekyll",
-    "deploy": "gh-pages -d dist -b gh-pages -t true -m \"Deploy $(date -u +%Y-%m-%dT%H:%M:%SZ)\""
+    "deploy": "gh-pages -d dist -b gh-pages --dotfiles -m \"Deploy SMPLR\""
   },
   "dependencies": {
     "idb": "^8.0.0",
