@@ -42,7 +42,7 @@ export function PadGrid() {
 
   return (
     <section className="view play-view">
-      <h2 className="view-title">パッド</h2>
+      <h2 className="view-title">パッド <span className="hint inline">タップで再生 / 右上 ✎ で割当</span></h2>
       <div className="pad-grid" style={{ ['--pads' as string]: PAD_COUNT }}>
         {pads.map((pad) => {
           const meta = pad.sampleId ? samples[pad.sampleId] : null;
@@ -50,7 +50,7 @@ export function PadGrid() {
           return (
             <button
               key={pad.id}
-              className={`pad ${on ? 'down' : ''} ${pad.loop ? 'loop' : ''}`}
+              className={`pad ${on ? 'down' : ''} ${pad.loop ? 'loop' : ''} ${!meta ? 'empty' : ''}`}
               onPointerDown={(e) => { e.preventDefault(); onDown(pad.id); }}
               onPointerUp={() => onUp(pad.id)}
               onPointerCancel={() => onUp(pad.id)}
@@ -58,7 +58,15 @@ export function PadGrid() {
               onContextMenu={(e) => { e.preventDefault(); setMenuFor(pad.id); }}
             >
               <span className="pad-num">{String(pad.id + 1).padStart(2, '0')}</span>
-              <span className="pad-name">{meta ? meta.name : '— empty —'}</span>
+              {/* visible re-assign button — always available, even on filled pads */}
+              <span
+                className="pad-edit"
+                role="button"
+                aria-label="サンプル割当"
+                onPointerDown={(e) => { e.stopPropagation(); }}
+                onClick={(e) => { e.stopPropagation(); setMenuFor(pad.id); }}
+              >✎</span>
+              <span className="pad-name">{meta ? meta.name : 'タップで割当'}</span>
               {pad.loop && <span className="pad-flag">LOOP</span>}
             </button>
           );

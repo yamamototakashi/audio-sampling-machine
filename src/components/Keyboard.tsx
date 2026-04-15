@@ -41,7 +41,9 @@ function buildKeys(octaves: number, baseOctave: number): { whites: KeyDef[]; bla
 export function Keyboard() {
   const samples = useAppStore((s) => s.samples);
   const selectedId = useAppStore((s) => s.selectedSampleId);
+  const selectSample = useAppStore((s) => s.selectSample);
   const sample = selectedId ? samples[selectedId] : null;
+  const sampleList = Object.values(samples);
 
   const [root, setRoot] = useState(0); // semitone offset for the leftmost C
   const [held, setHeld] = useState<Set<number>>(new Set());
@@ -67,6 +69,20 @@ export function Keyboard() {
 
   return (
     <section className="view kbd-view">
+      <h2 className="view-title">鍵盤 <span className="hint inline">選んだサンプルをピッチシフト</span></h2>
+      <div className="kbd-toolbar">
+        <span className="lbl">SMPL</span>
+        <select
+          className="select small"
+          value={selectedId ?? ''}
+          onChange={(e) => selectSample(e.target.value || null)}
+        >
+          <option value="">— 選択 —</option>
+          {sampleList.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+      </div>
       <div className="kbd-toolbar">
         <span className="lbl">ROOT</span>
         <button className="btn small" onClick={() => setRoot((r) => r - 12)}>-12</button>

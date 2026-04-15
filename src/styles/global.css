@@ -380,6 +380,24 @@ button:active { transform: translateY(1px); filter: brightness(0.92); }
   position: absolute; top: 6px; right: 8px;
   font-size: 9px; color: var(--accent-warm); letter-spacing: 0.14em;
 }
+.pad-edit {
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  border-radius: 6px;
+  background: rgba(15, 18, 22, 0.7);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 13px; line-height: 1;
+  z-index: 2;
+}
+.pad-edit:active { background: rgba(110, 226, 240, 0.18); }
+.pad.empty {
+  background: linear-gradient(180deg, #181b21, #0e1116);
+  border-style: dashed;
+}
+.pad.empty .pad-name { color: var(--text-mute); font-style: italic; }
 .pad.loop { border-color: rgba(240, 196, 110, 0.35); }
 .pad.down {
   transform: translateY(2px);

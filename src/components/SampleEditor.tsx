@@ -48,7 +48,10 @@ export function SampleEditor() {
       <section className="view edit-view">
         <h2 className="view-title">編集</h2>
         <SampleList onPick={selectSample} />
-        <p className="hint">サンプルを選択してください。</p>
+        <p className="hint">
+          上のサンプル名をタップして選択 → 波形編集 / 鍵盤の音色になります。<br />
+          サンプルがない場合は <strong>REC</strong> タブで作成してください。
+        </p>
       </section>
     );
   }
